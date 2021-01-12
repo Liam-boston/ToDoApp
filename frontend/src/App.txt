@@ -1,0 +1,98 @@
+import React from "react"
+import Header from "./components/Header"
+import ToDoItem from "./components/ToDoItem"
+import CustomModal from "./components/Modal"
+import toDoData from "./toDoData"
+
+
+class App extends React.Component {
+    constructor() {
+        super()
+        this.state = {
+            modal: false,
+            activeItem: {
+                label: "",
+                completed: false
+            },
+            tasksToDo: toDoData
+        }
+        this.toggle = this.toggle.bind(this)
+        this.handleChange = this.handleChange.bind(this)
+        this.handleSubmit = this.handleSubmit.bind(this)
+        this.handleDelete = this.handleDelete.bind(this)
+        this.createItem = this.createItem.bind(this)
+        this.editItem = this.editItem.bind(this)
+    }
+
+    toggle() {
+        this.setState({modal: !this.state.modal})
+    }
+
+    handleSubmit(item){
+        this.toggle()
+        alert("save" + JSON.stringify(item))
+    }
+
+    handleDelete(item){
+        alert("delete" + JSON.stringify(item))
+    }
+
+    createItem(){
+        const item = {label: "", completed: false}
+        this.setState({activeItem: item, modal: !this.state.modal})
+    }
+
+    editItem(item){
+        this.setState({activeItem: item, modal: !this.state.modal})
+    }
+
+    handleChange(item, id) {
+        this.setState(function (prevState) {
+            const updatedTasksToDo = prevState.tasksToDo.map(function (task) {
+                if (task.id === id) {
+                    return {
+                        ...task,
+                        completed: !task.completed
+                    }
+                }
+                return task
+            })
+
+            return {
+                tasksToDo: updatedTasksToDo
+            }
+        })
+    }
+
+    render() {
+        const tasksToDisplay = this.state.tasksToDo.map(task =>
+            <ToDoItem
+                key={task.id}
+                task={task}
+                handleChange={this.handleChange}
+            />
+        )
+
+        return (
+            <div>
+                <Header />
+                <main className="todolist">
+                    {tasksToDisplay}
+                    <button onClick={this.createItem} className="btn btn-primary">
+                        Add Task
+                    </button>
+
+                    {this.state.modal ? (
+                        <CustomModal
+                            activeItem={this.state.activeItem}
+                            toggle={this.toggle}
+                            onSave={this.handleSubmit}
+                        />
+                    ) : null}
+                </main>
+            </div>
+        )
+    }
+}
+
+export default App;
